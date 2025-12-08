@@ -1,57 +1,37 @@
 # Acme Voice IT Helpdesk
 
-> **Enterprise IT Support Automation powered by [Vapi](https://vapi.ai)**
+Enterprise IT Support Automation powered by [Vapi](https://vapi.ai)
 
-A production-ready demo showcasing how Vapi's voice AI can automate Tier-1 IT support. This project simulates **Acme Corp**, an enterprise with ~5,000 employees, demonstrating an end-to-end voice-to-ticket experience.
+A production-ready system showcasing how Vapi's voice AI can automate Tier-1 IT support. This project simulates Acme Corp, an enterprise with ~5,000 employees, providing an end-to-end voice-to-ticket experience.
 
-🔗 **Live Demo**: [https://varshithdupati.github.io/vapi-it-helpdesk](https://varshithdupati.github.io/vapi-it-helpdesk)  
-🔗 **API**: [https://api.varshithdupati.com](https://api.varshithdupati.com/health)
-
----
-
-## 🎯 Business Problem
-
-Enterprise IT helpdesks face significant challenges:
-
-| Challenge | Impact |
-|-----------|--------|
-| High call volume | Expensive 24/7 staffing |
-| Repetitive Tier-1 questions | Agents doing low-value work |
-| Multiple system lookups | Slow handle times |
-| Inconsistent ticket quality | Delayed resolution |
-| Long queue wait times | Lost employee productivity |
-
-## ✨ Solution
-
-A **Vapi-powered voice agent** that:
-
-- ✅ Handles calls **24/7** without staffing costs
-- ✅ **Authenticates employees** by ID
-- ✅ **Looks up devices** via API
-- ✅ **Creates IT tickets** automatically
-- ✅ **Reads ticket numbers** back to employees
-- ✅ **Escalates complex cases** to humans
+**Live Application**: [https://varshithdupati.com/vapi-it-helpdesk](https://varshithdupati.com/vapi-it-helpdesk)
 
 ---
 
-## 🏗 Architecture
+## Overview
+
+This system enables employees to:
+- Call the IT helpdesk via web or phone
+- Verify their identity with an employee ID
+- Report technical issues with their assigned devices
+- Receive an automatically generated support ticket
+
+---
+
+## Architecture
 
 ```
-┌─────────────────┐      ┌─────────────────────────┐      ┌──────────────────┐
-│                 │      │                         │      │                  │
-│   Employee      │─────▶│    Vapi Voice Agent     │─────▶│  NestJS Backend  │
-│   (Web/Phone)   │      │                         │      │                  │
-│                 │◀─────│  • Speech-to-Text       │◀─────│  /api/employee   │
-└─────────────────┘      │  • LLM Processing       │      │  /api/tickets    │
-                         │  • Text-to-Speech       │      │  /health         │
-                         │  • Tool Execution       │      │                  │
-                         └─────────────────────────┘      └────────┬─────────┘
-                                                                   │
-                         ┌─────────────────────────┐               │
-                         │   React Frontend        │               ▼
-                         │   • Vapi Web SDK        │      ┌──────────────────┐
-                         │   • Live Ticket Feed    │      │  SQLite + Prisma │
-                         └─────────────────────────┘      └──────────────────┘
+Employee          Vapi Voice Agent           NestJS Backend
+   |                    |                         |
+   |--- Voice Call ---->|                         |
+   |                    |--- get_employee ------->|
+   |                    |<-- Employee + Devices --|
+   |                    |                         |
+   |<-- "Hi Alex..." ---|                         |
+   |--- Describe issue->|                         |
+   |                    |--- create_ticket ------>|
+   |                    |<-- Ticket IT-42 --------|
+   |<-- "Created IT-42"-|                         |
 ```
 
 ### Tech Stack
@@ -66,7 +46,7 @@ A **Vapi-powered voice agent** that:
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -94,21 +74,21 @@ npm install
 npm run dev
 ```
 
-**Backend**: http://localhost:3001  
-**Frontend**: http://localhost:5173
+Backend: http://localhost:3001
+Frontend: http://localhost:5173
 
 ---
 
-## 📡 API Reference
+## API Reference
 
 ### Base URL
 
-- **Production**: `https://api.varshithdupati.com`
-- **Development**: `http://localhost:3001`
+- Production: `https://api.varshithdupati.com`
+- Development: `http://localhost:3001`
 
 ### Endpoints
 
-#### `GET /health`
+#### GET /health
 
 Health check endpoint.
 
@@ -116,7 +96,7 @@ Health check endpoint.
 { "status": "ok", "timestamp": "2025-12-08T..." }
 ```
 
-#### `GET /api/employee/:id`
+#### GET /api/employee/:id
 
 Retrieve employee information and devices.
 
@@ -124,7 +104,7 @@ Retrieve employee information and devices.
 curl https://api.varshithdupati.com/api/employee/12345
 ```
 
-**Response (200)**:
+Response (200):
 ```json
 {
   "id": "12345",
@@ -137,7 +117,7 @@ curl https://api.varshithdupati.com/api/employee/12345
 }
 ```
 
-#### `POST /api/tickets`
+#### POST /api/tickets
 
 Create an IT support ticket.
 
@@ -151,7 +131,7 @@ curl -X POST https://api.varshithdupati.com/api/tickets \
   }'
 ```
 
-**Response (201)**:
+Response (201):
 ```json
 {
   "ticketNumber": "IT-42",
@@ -163,13 +143,13 @@ curl -X POST https://api.varshithdupati.com/api/tickets \
 }
 ```
 
-#### `GET /api/tickets`
+#### GET /api/tickets
 
 List all tickets (most recent first).
 
 ---
 
-## 🎙 Vapi Configuration
+## Vapi Configuration
 
 ### 1. Create Assistant
 
@@ -223,19 +203,16 @@ VITE_API_BASE_URL=https://api.varshithdupati.com
 
 ---
 
-## 👥 Test Data
+## Test Data
 
 | Name | Employee ID | Department | Devices |
 |------|-------------|------------|---------|
 | Alex Johnson | `12345` | Engineering | MacBook (L-9812), iPhone (P-4421) |
 | Priya Patel | `67890` | Sales | Windows Laptop (L-7741) |
-| Varshith Dupati | `54821` | Engineering | MacBook (L-3347), iPhone (P-8891) |
-| Trish English | `38472` | Marketing | Windows Laptop (L-6629), iPad (T-2215) |
-| Srikruth Reddy | `91563` | Product | MacBook (L-4458), Android Phone (P-7732) |
 
 ---
 
-## 🌐 Deployment
+## Deployment
 
 ### Backend (AWS EC2)
 
@@ -258,7 +235,7 @@ GitHub Actions workflows handle automated deployments:
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 vapi-it-helpdesk/
@@ -283,12 +260,6 @@ vapi-it-helpdesk/
 
 ---
 
-## 📄 License
+## License
 
 MIT License
-
----
-
-<p align="center">
-  Built with ❤️ as a Forward Deployed Engineer demo for <a href="https://vapi.ai">Vapi</a>
-</p>

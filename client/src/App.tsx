@@ -4,13 +4,6 @@ import { getTickets } from './api';
 import { VapiButton } from './components/VapiButton';
 import './App.css';
 
-/**
- * Acme Voice IT Helpdesk - Frontend Application
- * 
- * This demo showcases a Vapi-powered voice agent for enterprise IT support.
- * Integrated with Vapi Web SDK for real voice interactions.
- */
-
 function App() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +11,6 @@ function App() {
 
   useEffect(() => {
     fetchTickets();
-    // Refresh tickets every 10 seconds to show new ones created by voice agent
     const interval = setInterval(fetchTickets, 10000);
     return () => clearInterval(interval);
   }, []);
@@ -28,16 +20,14 @@ function App() {
       const data = await getTickets();
       setTickets(data);
       setError(null);
-    } catch (err) {
-      setError('Unable to connect to backend. Make sure the backend is running on port 3001.');
+    } catch {
+      setError('Unable to connect to the ticketing system.');
     } finally {
       setLoading(false);
     }
   };
 
-  // Refresh tickets when a call ends (new ticket may have been created)
   const handleCallEnd = useCallback(() => {
-    // Wait a moment for the ticket to be created, then refresh
     setTimeout(fetchTickets, 2000);
   }, []);
 
@@ -61,7 +51,7 @@ function App() {
             </div>
             <div className="logo-text">
               <span className="logo-company">Acme Corp</span>
-              <span className="logo-product">Voice IT Helpdesk</span>
+              <span className="logo-product">IT Helpdesk</span>
             </div>
           </div>
           <div className="powered-by">
@@ -73,15 +63,14 @@ function App() {
       <main className="main">
         <section className="hero">
           <div className="hero-content">
-            <div className="hero-badge">Enterprise IT Support Demo</div>
             <h1 className="hero-title">
-              AI Voice Agent for
-              <span className="gradient-text"> IT Helpdesk</span>
+              IT Support
+              <span className="gradient-text"> Voice Assistant</span>
             </h1>
             <p className="hero-description">
-              Experience the future of enterprise IT support. Our Vapi-powered voice agent 
-              handles Tier-1 support calls 24/7, verifies employees, and automatically 
-              creates IT tickets—reducing wait times and freeing your team for complex issues.
+              Get instant help with your technical issues. Our AI-powered voice assistant 
+              can verify your identity, look up your devices, and create support tickets
+              automatically. Available 24/7.
             </p>
             <div className="hero-cta">
               <VapiButton onCallEnd={handleCallEnd} />
@@ -89,79 +78,41 @@ function App() {
           </div>
         </section>
 
-        <section className="problem-solution">
-          <div className="section-header">
-            <h2>The Challenge & Solution</h2>
-          </div>
-          <div className="cards-grid">
-            <div className="card problem-card">
-              <div className="card-icon">⚠️</div>
-              <h3>The Problem</h3>
-              <ul>
-                <li>High volume of repetitive Tier-1 calls</li>
-                <li>Expensive 24/7 staffing requirements</li>
-                <li>Agents "swivel chair" between systems</li>
-                <li>Inconsistent ticket quality</li>
-                <li>Long wait times hurt productivity</li>
-              </ul>
-            </div>
-            <div className="card solution-card">
-              <div className="card-icon">✨</div>
-              <h3>The Solution</h3>
-              <ul>
-                <li>24/7 automated voice support</li>
-                <li>Instant employee verification</li>
-                <li>Automatic device lookup</li>
-                <li>Consistent, structured tickets</li>
-                <li>Complex cases escalated to humans</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
         <section className="flow-section">
           <div className="section-header">
             <h2>How It Works</h2>
-            <p>A complete voice-to-ticket experience in under 60 seconds</p>
+            <p>Get a support ticket in under 60 seconds</p>
           </div>
           <div className="flow-steps">
             <div className="flow-step">
               <div className="step-number">1</div>
               <div className="step-content">
-                <h4>Employee Calls</h4>
-                <p>Employee initiates call via web widget or phone number</p>
+                <h4>Start a Call</h4>
+                <p>Click the button above to connect with our voice assistant</p>
               </div>
             </div>
             <div className="flow-connector"></div>
             <div className="flow-step">
               <div className="step-number">2</div>
               <div className="step-content">
-                <h4>Identity Verification</h4>
-                <p>Agent asks for employee ID, calls <code>get_employee</code> API</p>
+                <h4>Verify Your Identity</h4>
+                <p>Provide your employee ID for verification</p>
               </div>
             </div>
             <div className="flow-connector"></div>
             <div className="flow-step">
               <div className="step-number">3</div>
               <div className="step-content">
-                <h4>Device & Issue Capture</h4>
-                <p>Agent identifies affected device and understands the issue</p>
+                <h4>Describe Your Issue</h4>
+                <p>Tell us which device is affected and what the problem is</p>
               </div>
             </div>
             <div className="flow-connector"></div>
             <div className="flow-step">
               <div className="step-number">4</div>
               <div className="step-content">
-                <h4>Ticket Creation</h4>
-                <p>Agent calls <code>create_ticket</code> API to open IT ticket</p>
-              </div>
-            </div>
-            <div className="flow-connector"></div>
-            <div className="flow-step">
-              <div className="step-number">5</div>
-              <div className="step-content">
-                <h4>Confirmation</h4>
-                <p>Agent reads ticket number back to employee</p>
+                <h4>Get Your Ticket</h4>
+                <p>Receive a ticket number for tracking your request</p>
               </div>
             </div>
           </div>
@@ -169,33 +120,33 @@ function App() {
 
         <section className="tickets-section">
           <div className="section-header">
-            <h2>Live Ticket Feed</h2>
-            <p>Tickets created by the voice agent appear here in real-time</p>
+            <h2>Recent Tickets</h2>
+            <p>Support tickets created through the voice assistant</p>
           </div>
           <div className="tickets-container">
             {loading ? (
               <div className="loading-state">
                 <div className="spinner"></div>
-                <p>Connecting to backend...</p>
+                <p>Loading tickets...</p>
               </div>
             ) : error ? (
               <div className="error-state">
                 <p>{error}</p>
                 <button onClick={fetchTickets} className="retry-button">
-                  Retry Connection
+                  Retry
                 </button>
               </div>
             ) : tickets.length === 0 ? (
               <div className="empty-state">
-                <p>No tickets yet. Try speaking to the voice agent!</p>
+                <p>No tickets yet. Start a call to create your first ticket.</p>
               </div>
             ) : (
               <div className="tickets-table-wrapper">
                 <table className="tickets-table">
                   <thead>
                     <tr>
-                      <th>Ticket #</th>
-                      <th>Employee ID</th>
+                      <th>Ticket</th>
+                      <th>Employee</th>
                       <th>Device</th>
                       <th>Issue</th>
                       <th>Status</th>
@@ -225,18 +176,12 @@ function App() {
             )}
           </div>
         </section>
-
       </main>
 
       <footer className="footer">
-        <p>
-          Built as a Forward Deployed Engineer demo for{' '}
-          <a href="https://vapi.ai" target="_blank" rel="noopener noreferrer">
-            Vapi
-          </a>
-        </p>
+        <p>Acme Corp IT Helpdesk</p>
         <p className="footer-subtitle">
-          Enterprise Voice AI for IT Helpdesk Automation
+          Powered by Vapi Voice AI
         </p>
       </footer>
     </div>
@@ -244,4 +189,3 @@ function App() {
 }
 
 export default App;
-

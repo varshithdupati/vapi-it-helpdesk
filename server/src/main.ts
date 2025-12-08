@@ -38,9 +38,9 @@ async function bootstrap() {
   const port = process.env.PORT || 3001;
   await app.listen(port, '0.0.0.0');
 
-  logger.log(`🚀 Acme IT Helpdesk Backend v1.0.0`);
-  logger.log(`📍 Running on port ${port}`);
-  logger.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+  logger.log(`Acme IT Helpdesk Backend v1.0.0`);
+  logger.log(`Running on port ${port}`);
+  logger.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 }
 
 bootstrap().catch((err) => {

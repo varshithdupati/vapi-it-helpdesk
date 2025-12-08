@@ -64,22 +64,22 @@ jobs:
           script: |
             set -e
             
-            echo "🛑 Stopping existing process..."
+            echo "Stopping existing process..."
             pm2 stop api 2>/dev/null || true
             
-            echo "📦 Extracting deployment package..."
+            echo "Extracting deployment package..."
             cd /var/www/api
             rm -rf dist prisma package.json package-lock.json
             tar -xzf /tmp/deploy-package.tar.gz
             rm /tmp/deploy-package.tar.gz
             
-            echo "📥 Installing production dependencies..."
+            echo "Installing production dependencies..."
             npm ci --omit=dev
             
-            echo "🗄️ Running database migrations..."
+            echo "Running database migrations..."
             DATABASE_URL="file:./prod.db" npx prisma migrate deploy
             
-            echo "🚀 Starting application..."
+            echo "Starting application..."
             NODE_ENV=production \
             DATABASE_URL="file:./prod.db" \
             PORT=3001 \
@@ -87,4 +87,4 @@ jobs:
             
             pm2 save
             
-            echo "✅ Deployment complete!"
+            echo "Deployment complete!"

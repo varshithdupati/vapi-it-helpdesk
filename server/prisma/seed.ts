@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Seeding database...');
+  console.log('Seeding database...');
 
   // Clear existing data
   await prisma.ticket.deleteMany();
@@ -34,7 +34,7 @@ async function main() {
     include: { devices: true },
   });
 
-  console.log(`✅ Created employee: ${alex.name} (${alex.id}) with ${alex.devices.length} devices`);
+  console.log(`Created employee: ${alex.name} (${alex.id}) with ${alex.devices.length} devices`);
 
   // Create Employee 67890 - Priya Patel, Sales
   const priya = await prisma.employee.create({
@@ -55,7 +55,7 @@ async function main() {
     include: { devices: true },
   });
 
-  console.log(`✅ Created employee: ${priya.name} (${priya.id}) with ${priya.devices.length} device(s)`);
+  console.log(`Created employee: ${priya.name} (${priya.id}) with ${priya.devices.length} device(s)`);
 
   // Create a sample ticket for demonstration
   const sampleTicket = await prisma.ticket.create({
@@ -68,14 +68,14 @@ async function main() {
     },
   });
 
-  console.log(`✅ Created sample ticket: ${sampleTicket.ticketNumber}`);
+  console.log(`Created sample ticket: ${sampleTicket.ticketNumber}`);
 
-  console.log('🎉 Database seeding completed!');
+  console.log('Database seeding completed!');
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Seeding failed:', e);
+    console.error('Seeding failed:', e);
     process.exit(1);
   })
   .finally(async () => {
