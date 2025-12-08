@@ -1,0 +1,41 @@
+// Prisma schema for Acme IT Helpdesk
+// This defines the data models for employees, devices, and tickets
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Employee model - represents Acme Corp employees
+model Employee {
+  id         String   @id // Employee ID (e.g., "12345")
+  name       String
+  department String
+  devices    Device[]
+}
+
+// Device model - represents devices assigned to employees
+model Device {
+  id         Int      @id @default(autoincrement())
+  type       String   // e.g., "laptop", "phone"
+  assetTag   String   @unique // e.g., "L-9812"
+  os         String   // e.g., "macOS 15", "Windows 11"
+  employee   Employee @relation(fields: [employeeId], references: [id])
+  employeeId String
+}
+
+// Ticket model - IT support tickets created by the voice agent
+model Ticket {
+  id             Int      @id @default(autoincrement())
+  ticketNumber   String   @unique // e.g., "IT-1", "IT-2"
+  employeeId     String
+  deviceAssetTag String
+  issueSummary   String
+  status         String   // e.g., "OPEN", "IN_PROGRESS", "RESOLVED"
+  createdAt      DateTime @default(now())
+}
+
