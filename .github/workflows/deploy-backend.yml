@@ -82,8 +82,8 @@ jobs:
             # Seed if first deployment (ignore errors if already seeded)
             DATABASE_URL="file:./prod.db" npx prisma db seed 2>/dev/null || true
             
-            # Start/restart with PM2
-            DATABASE_URL="file:./prod.db" PORT=3001 pm2 start dist/main.js --name api --update-env
+            # Start/restart with PM2 (NestJS outputs to dist/src/main.js)
+            DATABASE_URL="file:./prod.db" PORT=3001 pm2 start dist/src/main.js --name api --update-env
             
             # Save PM2 config
             pm2 save
