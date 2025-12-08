@@ -67,17 +67,72 @@ jobs:
             echo "Stopping existing process..."
             pm2 stop api 2>/dev/null || true
             
-            echo "Extracting deployment package..."
+            echo "Backing up database..."
             cd /var/www/api
+            if [ -f prod.db ]; then
+              cp prod.db /tmp/prod.db.backup
+              echo "Database backed up"
+            else
+              echo "No existing database found"
+            fi
+            
+            echo "Extracting deployment package..."
             rm -rf dist prisma package.json package-lock.json
             tar -xzf /tmp/deploy-package.tar.gz
             rm /tmp/deploy-package.tar.gz
+            
+            echo "Restoring database..."
+            if [ -f /tmp/prod.db.backup ]; then
+              mv /tmp/prod.db.backup prod.db
+              echo "Database restored"
+            fi
             
             echo "Installing production dependencies..."
             npm ci --omit=dev
             
             echo "Running database migrations..."
             DATABASE_URL="file:./prod.db" npx prisma migrate deploy
+            
+            echo "Seeding database if empty..."
+            DATABASE_URL="file:./prod.db" node -e "
+              const { PrismaClient } = require('@prisma/client');
+              const prisma = new PrismaClient();
+              
+              async function seedIfEmpty() {
+                const count = await prisma.employee.count();
+                if (count > 0) {
+                  console.log('Database has ' + count + ' employees, skipping seed');
+                  return;
+                }
+                
+                console.log('Database is empty, seeding...');
+                
+                await prisma.employee.create({
+                  data: {
+                    id: '12345', name: 'Alex Johnson', department: 'Engineering',
+                    devices: { create: [
+                      { type: 'laptop', assetTag: 'L-9812', os: 'macOS 15' },
+                      { type: 'phone', assetTag: 'P-4421', os: 'iOS 18' }
+                    ]}
+                  }
+                });
+                
+                await prisma.employee.create({
+                  data: {
+                    id: '67890', name: 'Priya Patel', department: 'Sales',
+                    devices: { create: [
+                      { type: 'laptop', assetTag: 'L-7741', os: 'Windows 11' }
+                    ]}
+                  }
+                });
+                
+                console.log('Seeding complete');
+              }
+              
+              seedIfEmpty()
+                .catch(console.error)
+                .finally(() => prisma.\$disconnect());
+            "
             
             echo "Starting application..."
             NODE_ENV=production \
