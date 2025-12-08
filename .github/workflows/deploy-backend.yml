@@ -6,12 +6,13 @@ on:
     paths:
       - 'server/**'
       - '.github/workflows/deploy-backend.yml'
-  workflow_dispatch:  # Allow manual trigger
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+    environment: production
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -61,32 +62,29 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Stop existing process
+            set -e
+            
+            echo "🛑 Stopping existing process..."
             pm2 stop api 2>/dev/null || true
             
-            # Extract package
+            echo "📦 Extracting deployment package..."
             cd /var/www/api
             rm -rf dist prisma package.json package-lock.json
             tar -xzf /tmp/deploy-package.tar.gz
             rm /tmp/deploy-package.tar.gz
             
-            # Install production dependencies
+            echo "📥 Installing production dependencies..."
             npm ci --omit=dev
             
-            # Copy Prisma client
-            cp -r node_modules/.prisma node_modules/ 2>/dev/null || true
-            
-            # Run migrations
+            echo "🗄️ Running database migrations..."
             DATABASE_URL="file:./prod.db" npx prisma migrate deploy
             
-            # Seed if first deployment (ignore errors if already seeded)
-            DATABASE_URL="file:./prod.db" npx prisma db seed 2>/dev/null || true
+            echo "🚀 Starting application..."
+            NODE_ENV=production \
+            DATABASE_URL="file:./prod.db" \
+            PORT=3001 \
+            pm2 start dist/src/main.js --name api --update-env
             
-            # Start/restart with PM2 (NestJS outputs to dist/src/main.js)
-            DATABASE_URL="file:./prod.db" PORT=3001 pm2 start dist/src/main.js --name api --update-env
-            
-            # Save PM2 config
             pm2 save
             
-            echo "✅ Backend deployed successfully!"
-
+            echo "✅ Deployment complete!"
