@@ -81,11 +81,6 @@ Frontend: http://localhost:5173
 
 ## API Reference
 
-### Base URL
-
-- Production: `https://api.varshithdupati.com`
-- Development: `http://localhost:3001`
-
 ### Endpoints
 
 #### GET /health
@@ -179,6 +174,7 @@ Guidelines:
 | Setting | Value |
 |---------|-------|
 | Name | `get_employee` |
+| Type | `HTTP Request` |
 | Method | `GET` |
 | URL | `https://api.varshithdupati.com/api/employee/{{employeeId}}` |
 
@@ -186,10 +182,24 @@ Guidelines:
 | Setting | Value |
 |---------|-------|
 | Name | `create_ticket` |
+| Type | `HTTP Request` |
 | Method | `POST` |
 | URL | `https://api.varshithdupati.com/api/tickets` |
 | Headers | `Content-Type: application/json` |
 | Body | `{"employeeId":"{{employeeId}}","deviceAssetTag":"{{deviceAssetTag}}","issueSummary":"{{issueSummary}}"}` |
+
+**Tool 3: end_call**
+| Setting | Value |
+|---------|-------|
+| Name | `end_call` |
+| Type | `endCall` (built-in) |
+| Description | `End the current call. Use when the conversation is complete, user requests human support, or after saying goodbye.` |
+
+The assistant should call `end_call` after:
+- User confirms they have no more questions
+- User says goodbye or thanks
+- User requests to speak with a human agent
+- Identity verification fails after 3 attempts
 
 ### 3. Configure Frontend
 
@@ -198,7 +208,6 @@ Set environment variables:
 ```bash
 VITE_VAPI_PUBLIC_KEY=pk_your_key_here
 VITE_VAPI_ASSISTANT_ID=your_assistant_id_here
-VITE_API_BASE_URL=https://api.varshithdupati.com
 ```
 
 ---
@@ -262,4 +271,4 @@ vapi-it-helpdesk/
 
 ## License
 
-MIT License
+This project is licensed under the [MIT License](LICENSE).
