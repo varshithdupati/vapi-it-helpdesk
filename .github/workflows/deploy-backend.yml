@@ -64,79 +64,75 @@ jobs:
           script: |
             set -e
             
+            # Database is stored in /var/www/api/data/ to persist across deployments
+            DB_DIR="/var/www/api/data"
+            DB_PATH="$DB_DIR/prod.db"
+            
             echo "Stopping existing process..."
             pm2 stop api 2>/dev/null || true
             
-            echo "Backing up database..."
-            cd /var/www/api
-            if [ -f prod.db ]; then
-              cp prod.db /tmp/prod.db.backup
-              echo "Database backed up"
-            else
-              echo "No existing database found"
-            fi
+            echo "Ensuring data directory exists..."
+            mkdir -p $DB_DIR
             
             echo "Extracting deployment package..."
+            cd /var/www/api
             rm -rf dist prisma package.json package-lock.json
             tar -xzf /tmp/deploy-package.tar.gz
             rm /tmp/deploy-package.tar.gz
-            
-            echo "Restoring database..."
-            if [ -f /tmp/prod.db.backup ]; then
-              mv /tmp/prod.db.backup prod.db
-              echo "Database restored"
-            fi
             
             echo "Installing production dependencies..."
             npm ci --omit=dev
             
             echo "Running database migrations..."
-            DATABASE_URL="file:./prod.db" npx prisma migrate deploy
+            DATABASE_URL="file:$DB_PATH" npx prisma migrate deploy
             
-            echo "Seeding database if empty..."
-            DATABASE_URL="file:./prod.db" node -e "
+            echo "Checking database..."
+            EMPLOYEE_COUNT=$(DATABASE_URL="file:$DB_PATH" node -e "
               const { PrismaClient } = require('@prisma/client');
               const prisma = new PrismaClient();
-              
-              async function seedIfEmpty() {
-                const count = await prisma.employee.count();
-                if (count > 0) {
-                  console.log('Database has ' + count + ' employees, skipping seed');
-                  return;
+              prisma.employee.count().then(c => { console.log(c); prisma.\$disconnect(); });
+            " 2>/dev/null || echo "0")
+            
+            echo "Found $EMPLOYEE_COUNT employees in database"
+            
+            if [ "$EMPLOYEE_COUNT" = "0" ]; then
+              echo "Database is empty, seeding..."
+              DATABASE_URL="file:$DB_PATH" node -e "
+                const { PrismaClient } = require('@prisma/client');
+                const prisma = new PrismaClient();
+                
+                async function seed() {
+                  await prisma.employee.create({
+                    data: {
+                      id: '12345', name: 'Alex Johnson', department: 'Engineering',
+                      devices: { create: [
+                        { type: 'laptop', assetTag: 'L-9812', os: 'macOS 15' },
+                        { type: 'phone', assetTag: 'P-4421', os: 'iOS 18' }
+                      ]}
+                    }
+                  });
+                  
+                  await prisma.employee.create({
+                    data: {
+                      id: '67890', name: 'Priya Patel', department: 'Sales',
+                      devices: { create: [
+                        { type: 'laptop', assetTag: 'L-7741', os: 'Windows 11' }
+                      ]}
+                    }
+                  });
+                  
+                  console.log('Seeding complete');
                 }
                 
-                console.log('Database is empty, seeding...');
-                
-                await prisma.employee.create({
-                  data: {
-                    id: '12345', name: 'Alex Johnson', department: 'Engineering',
-                    devices: { create: [
-                      { type: 'laptop', assetTag: 'L-9812', os: 'macOS 15' },
-                      { type: 'phone', assetTag: 'P-4421', os: 'iOS 18' }
-                    ]}
-                  }
-                });
-                
-                await prisma.employee.create({
-                  data: {
-                    id: '67890', name: 'Priya Patel', department: 'Sales',
-                    devices: { create: [
-                      { type: 'laptop', assetTag: 'L-7741', os: 'Windows 11' }
-                    ]}
-                  }
-                });
-                
-                console.log('Seeding complete');
-              }
-              
-              seedIfEmpty()
-                .catch(console.error)
-                .finally(() => prisma.\$disconnect());
-            "
+                seed().catch(console.error).finally(() => prisma.\$disconnect());
+              "
+            else
+              echo "Database has data, skipping seed"
+            fi
             
             echo "Starting application..."
             NODE_ENV=production \
-            DATABASE_URL="file:./prod.db" \
+            DATABASE_URL="file:$DB_PATH" \
             PORT=3001 \
             pm2 start dist/src/main.js --name api --update-env
             
