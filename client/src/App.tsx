@@ -167,35 +167,6 @@ function App() {
           </div>
         </section>
 
-        <section className="architecture-section">
-          <div className="section-header">
-            <h2>Architecture</h2>
-          </div>
-          <div className="architecture-diagram">
-            <pre className="diagram-code">{`
-┌─────────────────┐      ┌─────────────────────────┐      ┌──────────────────┐
-│                 │      │                         │      │                  │
-│   Employee      │─────▶│    Vapi Voice Agent     │─────▶│  NestJS Backend  │
-│   (Web/Phone)   │      │                         │      │                  │
-│                 │◀─────│  • System Prompt        │◀─────│  /api/employee   │
-└─────────────────┘      │  • get_employee tool    │      │  /api/tickets    │
-                         │  • create_ticket tool   │      │                  │
-                         │                         │      └────────┬─────────┘
-                         └─────────────────────────┘               │
-                                                                   ▼
-                                                          ┌──────────────────┐
-                                                          │                  │
-                                                          │  SQLite + Prisma │
-                                                          │                  │
-                                                          │  • Employees     │
-                                                          │  • Devices       │
-                                                          │  • Tickets       │
-                                                          │                  │
-                                                          └──────────────────┘
-            `}</pre>
-          </div>
-        </section>
-
         <section className="tickets-section">
           <div className="section-header">
             <h2>Live Ticket Feed</h2>
@@ -255,37 +226,6 @@ function App() {
           </div>
         </section>
 
-        <section className="demo-employees">
-          <div className="section-header">
-            <h2>Demo Employees</h2>
-            <p>Use these employee IDs to test the voice agent</p>
-          </div>
-          <div className="employees-grid">
-            <div className="employee-card">
-              <div className="employee-avatar">AJ</div>
-              <div className="employee-info">
-                <h4>Alex Johnson</h4>
-                <p className="employee-id">ID: <code>12345</code></p>
-                <p className="employee-dept">Engineering</p>
-                <div className="employee-devices">
-                  <span className="device-tag">💻 L-9812 (macOS 15)</span>
-                  <span className="device-tag">📱 P-4421 (iOS 18)</span>
-                </div>
-              </div>
-            </div>
-            <div className="employee-card">
-              <div className="employee-avatar">PP</div>
-              <div className="employee-info">
-                <h4>Priya Patel</h4>
-                <p className="employee-id">ID: <code>67890</code></p>
-                <p className="employee-dept">Sales</p>
-                <div className="employee-devices">
-                  <span className="device-tag">💻 L-7741 (Windows 11)</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
 
       <footer className="footer">

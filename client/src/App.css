@@ -242,24 +242,6 @@ section {
   margin-left: calc(var(--spacing-lg) + 19px);
 }
 
-/* Architecture diagram */
-.architecture-diagram {
-  background: var(--color-bg-tertiary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  overflow-x: auto;
-}
-
-.diagram-code {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  line-height: 1.4;
-  color: var(--color-text-secondary);
-  white-space: pre;
-  margin: 0;
-}
-
 /* Tickets section */
 .tickets-container {
   background: var(--color-bg-card);
@@ -384,67 +366,6 @@ section {
   font-size: 0.75rem;
   color: var(--color-text-muted);
   white-space: nowrap;
-}
-
-/* Demo employees */
-.employees-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--spacing-lg);
-}
-
-.employee-card {
-  display: flex;
-  gap: var(--spacing-lg);
-  padding: var(--spacing-lg);
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-}
-
-.employee-avatar {
-  flex-shrink: 0;
-  width: 56px;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--color-accent-gradient);
-  color: white;
-  font-weight: 600;
-  font-size: 1.25rem;
-  border-radius: 50%;
-}
-
-.employee-info h4 {
-  margin-bottom: var(--spacing-xs);
-}
-
-.employee-id {
-  font-size: 0.875rem;
-  color: var(--color-text-secondary);
-  margin-bottom: var(--spacing-xs);
-}
-
-.employee-dept {
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
-  margin-bottom: var(--spacing-sm);
-}
-
-.employee-devices {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-xs);
-}
-
-.device-tag {
-  display: inline-block;
-  padding: 0.25em 0.5em;
-  background: var(--color-bg-tertiary);
-  border-radius: var(--radius-sm);
-  font-size: 0.75rem;
-  color: var(--color-text-secondary);
 }
 
 /* Footer */
